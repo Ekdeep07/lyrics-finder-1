@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Music Finder</title>
+    <link rel="icon" type="image/png" href="Tony_s_Lyrics_logo_design_4-removebg-preview.png" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="body.css">
+</head>
+
+<body>
+    <header class="header">
+        <img class="logo"
+            src="C:\Users\Ekdeep\OneDrive\Documents\lyrics finder\Tony_s_Lyrics_logo_design_4-removebg-preview - Copy.png"
+            alt="Music Finder Logo" id="header__logo">
+    </header>
+
+    <form class="form" id="lyricsForm">
+        <div class="input-group">
+            <label class="form__label" for="artistName">Artist</label> <br>
+            <input class="form__input" name="artistName" id="artistName" type="text">
+        </div>
+
+        <div class="input-group">
+            <label class="form__label" for="songName">Song</label> <br>
+            <input class="form__input" name="songName" id="songName" type="text">
+        </div>
+
+        <button type="submit" id="btnFind">Find</button>
+    </form>
+
+    <main class="lyrics">
+        <h2 class="lyrics__name" id="lyrics__name"></h2>
+        <leg class="lyrics__artist" id="lyrics__artist"></leg>
+        <p id="lyrics__song"></p>
+    </main>
+
+    <script>
+      
+        document.getElementById('lyricsForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const artist = document.getElementById('artistName').value.trim();
+            const song = document.getElementById('songName').value.trim();
+
+            if (artist === '' || song === '') {
+                alert('Please fill in both fields');
+                return;
+            }
+
+            fetch(`https://api.lyrics.ovh/v1/${artist}/${song}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('API response:', data); // Log the API response for debugging
+                    if (data.lyrics) {
+                        document.getElementById('lyrics__name').innerText = song;
+                        document.getElementById('lyrics__artist').innerText = artist;
+                        document.getElementById('lyrics__song').innerText = data.lyrics;
+                    } else {
+                        document.getElementById('lyrics__name').innerText = 'Not Found';
+                        document.getElementById('lyrics__artist').innerText = '';
+                        document.getElementById('lyrics__song').innerText = 'Lyrics not available.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching lyrics:', error);
+                    document.getElementById('lyrics__name').innerText = 'Error';
+                    document.getElementById('lyrics__artist').innerText = '';
+                    document.getElementById('lyrics__song').innerText = 'Could not fetch lyrics. Please try again later.';
+                });
+        });
+    </script>
+</body>
+
+</html>
